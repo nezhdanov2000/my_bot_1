@@ -1,5 +1,5 @@
 -- Удаляем старую версию базы если нужно
-DROP DATABASE IF EXISTS bot_database;
+-- DROP DATABASE IF EXISTS bot_database;
 
 -- Создаем базу заново
 CREATE DATABASE bot_database 
