@@ -13,3 +13,12 @@ BOT_TOKEN = "8157057549:AAEKTLYmtEQJn8OaN9GTgNT9z2nQe_rL6oQ"  # Ваш токе�
 # WORKING_HOURS = [f"{h:02d}:00" for h in range(0, 24)] + [f"{h:02d}:30" for h in range(0, 24)]
 # WORKING_DAYS_RANGE = 365  # Год для записи вперед
 # TIMEZONE = "Europe/Moscow"
+
+DB_CONFIG = {
+    'host': os.getenv('DB_HOST'),
+    'database': os.getenv('DB_NAME'),
+    'user': os.getenv('DB_USER'),
+    'password': os.getenv('DB_PASSWORD'),
+    'port': int(os.getenv('DB_PORT', 3306)),
+    'auth_plugin': 'mysql_native_password'  # Важно для MySQL 8+
+}
