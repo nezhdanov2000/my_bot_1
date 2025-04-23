@@ -33,6 +33,68 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+# --------------------------------------------------------------------------------------------
+
+
+
+async def send_user_data_to_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        # Получаем данные клиента
+        cursor.execute('''
+            SELECT id, telegram_id, full_name, username, created_at 
+            FROM clients 
+            WHERE telegram_id = %s
+        ''', (user.id,))
+        client_data = cursor.fetchone()
+
+        if client_data:
+            # Распаковываем данные кортежа
+            client_id, telegram_id, full_name, username, created_at = client_data
+            
+            # Получаем записи
+            cursor.execute('''
+                SELECT a.day_of_week, a.start_time, t.end_time 
+                FROM appointments a
+                JOIN time_slots t ON a.day_of_week = t.day_of_week 
+                    AND a.start_time = t.start_time
+                WHERE a.client_id = %s
+            ''', (client_id,))
+            appointments = cursor.fetchall()
+
+            # Формируем сообщение
+            message = (
+                f"👤 Данные клиента:\n"
+                f"ID: {client_id}\n"
+                f"Telegram ID: {telegram_id}\n"
+                f"Имя: {full_name}\n"
+                f"Юзернейм: @{username}\n"
+                f"Дата регистрации: {created_at}\n\n"
+                f"📅 Активные записи:\n"
+            )
+            
+            for day, start, end in appointments:
+                message += f"• {day} {start} - {end}\n"
+
+            await context.bot.send_message(
+                chat_id=5098354385,
+                text=message
+            )
+            await update.message.reply_text("✅ Данные отправлены администратору!")
+        else:
+            await update.message.reply_text("❌ Вы не зарегистрированы в системе")
+
+        cursor.close()
+        conn.close()
+
+    except Exception as e:
+        logging.error(f"Ошибка отправки данных: {str(e)}", exc_info=True)
+        await update.message.reply_text("⚠️ Произошла ошибка при отправке данных")
+
+
 # -------------------------------------------------------------------------------------------
 
 def get_booking_handler() -> ConversationHandler:
@@ -314,3 +376,7 @@ async def show_appointments(update: Update, context: ContextTypes.DEFAULT_TYPE):
     except Exception as e:
         logger.error(f"Error in show_appointments: {str(e)}", exc_info=True)
         await update.message.reply_text("⚠️ Произошла ошибка при получении записей")
+
+
+# --------------------------------------------------------------------------------------------
+

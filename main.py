@@ -10,6 +10,7 @@ from telegram.ext import (
     CallbackQueryHandler
 )
 import logging
+from bot.handlers.admin import get_admin_handler
 
 
 # Уберите повторный вызов basicConfig
@@ -22,6 +23,8 @@ logging.basicConfig(
 def main():
     app = Application.builder().token(BOT_TOKEN).build()
     init_database()
+
+    app.add_handler(get_admin_handler())
 
     # Основные команды
     app.add_handler(CommandHandler("start", common.start))
@@ -51,9 +54,15 @@ def main():
 
     # Помощь
     app.add_handler(MessageHandler(
-        filters.Text(["🆘 Помощь"]),
+        filters.Text(["⭐️ Информация"]),
         common.help
     ))
+
+    # Передача данных админу
+    app.add_handler(MessageHandler(
+        filters.Text(["📨 Прошу связаться со мной"]),
+        appointment.send_user_data_to_admin
+))
     
     # Обработчик ошибок
     app.add_error_handler(error_handler)
