@@ -14,8 +14,6 @@ BOT_TOKEN = "8157057549:AAGBntU0vC1WaVOjNnRRsgAAn3kyFt0P1c8"  # Ваш токе�
 # WORKING_DAYS_RANGE = 365  # Год для записи вперед
 # TIMEZONE = "Europe/Moscow"
 
-ADMIN_IDS = [5098354385]
-
 DB_CONFIG = {
     'host': os.getenv('DB_HOST'),
     'database': os.getenv('DB_NAME'),
